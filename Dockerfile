@@ -10,9 +10,9 @@ RUN mkdir -p /sd-models
 #   wget https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors
 #   wget https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0/resolve/main/sd_xl_refiner_1.0.safetensors
 #   wget https://huggingface.co/madebyollin/sdxl-vae-fp16-fix/resolve/main/sdxl_vae.safetensors
-COPY sd_xl_base_1.0.safetensors /sd-models/sd_xl_base_1.0.safetensors
-COPY sd_xl_refiner_1.0.safetensors /sd-models/sd_xl_refiner_1.0.safetensors
-COPY sdxl_vae.safetensors /sd-models/sdxl_vae.safetensors
+# COPY sd_xl_base_1.0.safetensors /sd-models/sd_xl_base_1.0.safetensors
+# COPY sd_xl_refiner_1.0.safetensors /sd-models/sd_xl_refiner_1.0.safetensors
+# COPY sdxl_vae.safetensors /sd-models/sdxl_vae.safetensors
 
 WORKDIR /
 
@@ -107,6 +107,22 @@ RUN /install_civitai_model_downloader.sh && rm /install_civitai_model_downloader
 
 # Stage 9: Finalise Image
 FROM civitai-dl-install AS final
+
+# Copy benchmark script
+COPY scripts/benchmark.sh /workspace/
+
+# Install AWS CLI v2
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install && \
+    rm -rf aws awscliv2.zip
+
+# Create necessary directories
+RUN mkdir -p /workspace/datasets /workspace/ckpt
+
+# Link ckpt folder to stable-diffusion-webui models
+RUN mkdir -p /workspace/stable-diffusion-webui/models/Stable-diffusion && \
+    ln -s /workspace/ckpt /workspace/stable-diffusion-webui/models/Stable-diffusion/ckpt
 
 # Remove existing SSH host keys
 RUN rm -f /etc/ssh/ssh_host_*

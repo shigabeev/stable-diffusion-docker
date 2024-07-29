@@ -2,7 +2,7 @@
 set -e
 
 # Clone the repo, checkout the version and the submodule
-git clone https://github.com/bmaltais/kohya_ss.git /kohya_ss
+git clone https://github.com/shigabeev/kohya_ss.git /kohya_ss
 cd /kohya_ss
 mv /requirements* /kohya_ss/
 git checkout ${KOHYA_VERSION}
